@@ -1,0 +1,31 @@
+{
+  "name": "movies-explorer-api",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "npx eslint .",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sunlight-nadezhda/movies-explorer-api.git"
+  },
+  "keywords": [],
+  "author": "Nadezhda Malokhatko",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/sunlight-nadezhda/movies-explorer-api/issues"
+  },
+  "homepage": "https://github.com/sunlight-nadezhda/movies-explorer-api#readme",
+  "devDependencies": {
+    "eslint": "^7.31.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4",
+    "nodemon": "^2.0.12"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
