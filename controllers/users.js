@@ -7,14 +7,14 @@ const NoValidateError = require('../errors/no-validate-err');
 
 // Получает информацию о пользователе
 module.exports.getUserInfo = (req, res, next) => {
-  const userId = req.user._id;
-  // const userId = '610120993f55d3d1913b6819';
+  // const userId = req.user._id;
+  const userId = '610120993f55d3d1913b6819';
   if (!mongoose.isValidObjectId(userId)) {
     throw new NoValidateError('userID пользователя не валиден');
   } else {
     User.findById(userId)
       .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
-      .then((user) => res.send(user))
+      .then(({ email, name }) => res.send({ email, name }))
       .catch(next);
   }
 };
@@ -26,17 +26,17 @@ module.exports.updateUserInfo = (req, res, next) => {
   if (!mongoose.isValidObjectId(userId)) {
     throw new NoValidateError('userID пользователя не валиден');
   } else {
-    const { name, email } = req.body;
+    const { email, name } = req.body;
     User.findByIdAndUpdate(
       userId,
-      { name, email },
+      { email, name },
       {
         new: true,
         runValidators: true,
       },
     )
       .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
-      .then((user) => res.send(user))
+      .then(({ emailUp, nameUp }) => res.send({ emailUp, nameUp }))
       .catch((err) => {
         if (err.name === 'ValidationError') {
           throw new NoValidateError('Проверьте введенные данные');
