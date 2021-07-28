@@ -37,6 +37,10 @@ module.exports.updateUserInfo = (req, res, next) => {
     )
       .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
       .then((user) => res.send(user))
-      .catch(next);
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          throw new NoValidateError('Проверьте введенные данные');
+        } else next(err);
+      });
   }
 };
