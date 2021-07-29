@@ -10,12 +10,12 @@ const IsAlreadyTakenError = require('../errors/is-already-taken-err');
 
 // Получает информацию о пользователе
 module.exports.getUserInfo = (req, res, next) => {
-  // const userId = req.user._id;
-  const userId = '610120993f55d3d1913b6819';
+  const userId = req.user._id;
+  // const userId = '610120993f55d3d1913b6819';
   if (!mongoose.isValidObjectId(userId)) {
     throw new NoValidateError('userID пользователя не валиден');
   } else {
-    User.findById(userId)
+    return User.findById(userId)
       .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
       .then(({ email, name }) => res.send({ email, name }))
       .catch(next);
@@ -24,13 +24,12 @@ module.exports.getUserInfo = (req, res, next) => {
 
 // Обновляет информацию о пользователе
 module.exports.updateUserInfo = (req, res, next) => {
-  // const userId = req.user._id;
-  const userId = '610120993f55d3d1913b6819';
+  const userId = req.user._id;
   if (!mongoose.isValidObjectId(userId)) {
     throw new NoValidateError('userID пользователя не валиден');
   } else {
     const { email, name } = req.body;
-    User.findByIdAndUpdate(
+    return User.findByIdAndUpdate(
       userId,
       { email, name },
       {
@@ -61,16 +60,17 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
       name,
-    }))
+    })
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          throw new NoValidateError('Проверьте введенные данные');
+        } else if (err.name === 'MongoError' && err.code === 11000) {
+          throw new IsAlreadyTakenError('Введенный email уже занят');
+        } else next(err);
+      }))
     .then(({ email: emailSaved, name: nameSaved }) => res
       .send({ email: emailSaved, name: nameSaved }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new NoValidateError('Проверьте введенные данные');
-      } else if (err.name === 'MongoError' && err.code === 11000) {
-        throw new IsAlreadyTakenError('Введенный email уже занят');
-      } else next(err);
-    });
+    .catch(next);
 };
 
 // Проверяет переданные в теле почту и пароль, возвращает JWT
@@ -90,7 +90,7 @@ module.exports.login = (req, res, next) => {
           maxAge: 3600000,
           httpOnly: true,
           sameSite: false,
-          secure: true,
+          // secure: true,
         })
         .send({ message: 'Вы успешно авторизованы!' });
     })
@@ -99,13 +99,15 @@ module.exports.login = (req, res, next) => {
 
 // Удаляет JWT из кук
 module.exports.logout = (req, res, next) => {
-  res
-    .clearCookie('jwt', {
-      httpOnly: true,
-      sameSite: false,
-      secure: true,
-    })
-    .send({ message: 'Вы успешно разлогинились!' });
-
-  next();
+  try {
+    res
+      .clearCookie('jwt', {
+        httpOnly: true,
+        sameSite: false,
+        // secure: true,
+      })
+      .send({ message: 'Вы успешно разлогинились!' });
+  } catch (err) {
+    next(err);
+  }
 };
