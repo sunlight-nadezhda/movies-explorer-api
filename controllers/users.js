@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const User = require('../models/user');
 
 const NotFoundError = require('../errors/not-found-err');
 const NoValidateError = require('../errors/no-validate-err');
+const IsAlreadyTakenError = require('../errors/is-already-taken-err');
 
 // Получает информацию о пользователе
 module.exports.getUserInfo = (req, res, next) => {
@@ -36,11 +38,36 @@ module.exports.updateUserInfo = (req, res, next) => {
       },
     )
       .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
-      .then(({ emailUp, nameUp }) => res.send({ emailUp, nameUp }))
+      .then(({ email: emailUp, name: nameUp }) => res.send({ emailUp, nameUp }))
       .catch((err) => {
         if (err.name === 'ValidationError') {
           throw new NoValidateError('Проверьте введенные данные');
         } else next(err);
       });
   }
+};
+
+// Создаёт пользователя с переданными в теле email, password и name
+module.exports.createUser = (req, res, next) => {
+  const {
+    email,
+    password,
+    name,
+  } = req.body;
+
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      email,
+      password: hash,
+      name,
+    }))
+    .then(({ email: emailSaved, name: nameSaved }) => res
+      .send({ email: emailSaved, name: nameSaved }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new NoValidateError('Проверьте введенные данные');
+      } else if (err.name === 'MongoError' && err.code === 11000) {
+        throw new IsAlreadyTakenError('Введенный email уже занят');
+      } else next(err);
+    });
 };
