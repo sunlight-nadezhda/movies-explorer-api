@@ -96,3 +96,16 @@ module.exports.login = (req, res, next) => {
     })
     .catch(next);
 };
+
+// Удаляет JWT из кук
+module.exports.logout = (req, res, next) => {
+  res
+    .clearCookie('jwt', {
+      httpOnly: true,
+      sameSite: false,
+      secure: true,
+    })
+    .send({ message: 'Вы успешно разлогинились!' });
+
+  next();
+};
