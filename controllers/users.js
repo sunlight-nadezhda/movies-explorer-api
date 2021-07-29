@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
 const User = require('../models/user');
-
 const NotFoundError = require('../errors/not-found-err');
 const NoValidateError = require('../errors/no-validate-err');
 const IsAlreadyTakenError = require('../errors/is-already-taken-err');
@@ -70,4 +71,28 @@ module.exports.createUser = (req, res, next) => {
         throw new IsAlreadyTakenError('Введенный email уже занят');
       } else next(err);
     });
+};
+
+// Проверяет переданные в теле почту и пароль, возвращает JWT
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' },
+      );
+
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000,
+          httpOnly: true,
+          sameSite: false,
+          secure: true,
+        })
+        .send({ message: 'Вы успешно авторизованы!' });
+    })
+    .catch(next);
 };
