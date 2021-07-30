@@ -63,12 +63,6 @@ module.exports.validateMovie = celebrate({
         'string.required': vallidateMessages.directorRequired,
       }),
     duration: Joi.number().required()
-      .custom((value, helpers) => {
-        if (!validator.isEmpty(value)) {
-          return value;
-        }
-        return helpers.message(vallidateMessages.durationRequired);
-      })
       .messages({
         'number.required': vallidateMessages.durationRequired,
       }),
@@ -120,12 +114,6 @@ module.exports.validateMovie = celebrate({
         'string.required': vallidateMessages.thumbnailRequired,
       }),
     movieId: Joi.number().required()
-      .custom((value, helpers) => {
-        if (!validator.isEmpty(value)) {
-          return value;
-        }
-        return helpers.message(vallidateMessages.movieIdRequired);
-      })
       .messages({
         'number.required': vallidateMessages.movieIdRequired,
       }),
