@@ -1,26 +1,41 @@
 const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
 
+const { vallidateMessages } = require('../constants');
+
 module.exports.validateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30)
+      .custom((value, helpers) => {
+        if (!validator.isEmpty(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.nameRequired);
+      })
       .messages({
-        'string.required': 'Поле name не должно быть пустым',
-        'string.min': 'В поле name должно быть минимум 2 символа',
-        'string.max': 'В поле name должно быть максимум 30 символов',
+        'string.required': vallidateMessages.nameRequired,
+        'string.min': vallidateMessages.nameMin,
+        'string.max': vallidateMessages.nameMax,
       }),
     password: Joi.string().required()
+      .custom((value, helpers) => {
+        if (!validator.isEmpty(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.passwordRequired);
+      })
       .messages({
-        'string.required': 'Поле password не должно быть пустым',
+        'string.required': vallidateMessages.passwordRequired,
       }),
-    email: Joi.string().required().custom((value, helpers) => {
-      if (validator.isEmail(value)) {
-        return value;
-      }
-      return helpers.message('В поле email должен быть введен валидный email');
-    })
+    email: Joi.string().required()
+      .custom((value, helpers) => {
+        if (validator.isEmail(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.invalidEmail);
+      })
       .messages({
-        'string.required': 'Поле email не должно быть пустым',
+        'string.required': vallidateMessages.emailRequired,
       }),
   }),
 });
@@ -28,63 +43,111 @@ module.exports.validateUser = celebrate({
 module.exports.validateMovie = celebrate({
   body: Joi.object().keys({
     country: Joi.string().required()
+      .custom((value, helpers) => {
+        if (!validator.isEmpty(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.countryRequired);
+      })
       .messages({
-        'string.required': 'Поле country не должно быть пустым',
+        'string.required': vallidateMessages.countryRequired,
       }),
     director: Joi.string().required()
+      .custom((value, helpers) => {
+        if (!validator.isEmpty(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.directorRequired);
+      })
       .messages({
-        'string.required': 'Поле director не должно быть пустым',
+        'string.required': vallidateMessages.directorRequired,
       }),
     duration: Joi.number().required()
+      .custom((value, helpers) => {
+        if (!validator.isEmpty(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.durationRequired);
+      })
       .messages({
-        'number.required': 'Поле duration не должно быть пустым',
+        'number.required': vallidateMessages.durationRequired,
       }),
     year: Joi.string().required()
+      .custom((value, helpers) => {
+        if (!validator.isEmpty(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.yearRequired);
+      })
       .messages({
-        'string.required': 'Поле year не должно быть пустым',
+        'string.required': vallidateMessages.yearRequired,
       }),
     description: Joi.string().required()
+      .custom((value, helpers) => {
+        if (!validator.isEmpty(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.descriptionRequired);
+      })
       .messages({
-        'string.required': 'Поле description не должно быть пустым',
+        'string.required': vallidateMessages.descriptionRequired,
       }),
     image: Joi.string().required().custom((value, helpers) => {
       if (validator.isURL(value)) {
         return value;
       }
-      return helpers.message('В поле image должен быть введен валидный url');
+      return helpers.message(vallidateMessages.invalidImageURL);
     })
       .messages({
-        'string.required': 'Поле image не должно быть пустым',
+        'string.required': vallidateMessages.imageRequired,
       }),
     trailer: Joi.string().required().custom((value, helpers) => {
       if (validator.isURL(value)) {
         return value;
       }
-      return helpers.message('В поле trailer должен быть введен валидный url');
+      return helpers.message(vallidateMessages.invalidTrailerURL);
     })
       .messages({
-        'string.required': 'Поле trailer не должно быть пустым',
+        'string.required': vallidateMessages.trailerRequired,
       }),
     thumbnail: Joi.string().required().custom((value, helpers) => {
       if (validator.isURL(value)) {
         return value;
       }
-      return helpers.message('В поле thumbnail должен быть введен валидный url');
+      return helpers.message(vallidateMessages.invalidThumbnailURL);
     })
       .messages({
-        'string.required': 'Поле thumbnail не должно быть пустым',
+        'string.required': vallidateMessages.thumbnailRequired,
       }),
     movieId: Joi.number().required()
+      .custom((value, helpers) => {
+        if (!validator.isEmpty(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.movieIdRequired);
+      })
       .messages({
-        'number.required': 'Поле movieId не должно быть пустым',
+        'number.required': vallidateMessages.movieIdRequired,
       }),
     nameRU: Joi.string().required()
+      .custom((value, helpers) => {
+        if (!validator.isEmpty(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.nameRURequired);
+      })
       .messages({
-        'string.required': 'Поле nameRU не должно быть пустым',
+        'string.required': vallidateMessages.nameRURequired,
       }),
     nameEN: Joi.string().required()
+      .custom((value, helpers) => {
+        if (!validator.isEmpty(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.nameENRequired);
+      })
       .messages({
-        'string.required': 'Поле nameEN не должно быть пустым',
+        'string.required': vallidateMessages.nameENRequired,
       }),
   }),
 });

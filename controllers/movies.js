@@ -6,6 +6,7 @@ const Movie = require('../models/movie');
 const NoValidateError = require('../errors/no-validate-err');
 const NotFoundError = require('../errors/not-found-err');
 const NotEnoughRightsError = require('../errors/not-enough-rights-err');
+const { errorMessages } = require('../constants');
 
 // Возвращает все сохранённые пользователем фильмы
 module.exports.getMovies = (req, res, next) => Movie.find({})
@@ -17,10 +18,10 @@ module.exports.getMovies = (req, res, next) => Movie.find({})
 module.exports.createMovie = (req, res, next) => {
   const userId = req.user._id;
   if (!mongoose.isValidObjectId(userId)) {
-    throw new NoValidateError('userID пользователя не валиден');
+    throw new NoValidateError(errorMessages.invalidUserId);
   } else {
     return User.findById(userId)
-      .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
+      .orFail(new NotFoundError(errorMessages.notFoundUser))
       .then(() => {
         const {
           country, director, duration, year, description,
@@ -44,7 +45,7 @@ module.exports.createMovie = (req, res, next) => {
           .then((user) => res.send(user))
           .catch((err) => {
             if (err.name === 'ValidationError') {
-              throw new NoValidateError('Проверьте введенные данные');
+              throw new NoValidateError(errorMessages.invalidData);
             } else next(err);
           });
       })
@@ -56,17 +57,17 @@ module.exports.createMovie = (req, res, next) => {
 module.exports.deleteMovieById = (req, res, next) => {
   const userId = req.user._id;
   if (!mongoose.isValidObjectId(userId)) {
-    throw new NoValidateError('userID пользователя не валиден');
+    throw new NoValidateError(errorMessages.invalidUserId);
   } else {
     return User.findById(userId)
-      .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
+      .orFail(new NotFoundError(errorMessages.notFoundUser))
       .then(() => {
         const { movieId } = req.params;
         Movie.findOne({ movieId })
-          .orFail(new NotFoundError('Запрашиваемый фильм не найден'))
+          .orFail(new NotFoundError(errorMessages.notFoundMovie))
           .then((movie) => {
             if (!movie.owner._id.equals(userId)) {
-              throw new NotEnoughRightsError('Не достаточно прав');
+              throw new NotEnoughRightsError(errorMessages.notEnoughRights);
             } else {
               Movie.findOneAndRemove({ movieId })
                 .populate(['owner'])

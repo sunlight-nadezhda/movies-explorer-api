@@ -2,21 +2,21 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { NODE_ENV, JWT_SECRET } = require('../config');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const NoValidateError = require('../errors/no-validate-err');
-const IsAlreadyTakenError = require('../errors/is-already-taken-err');
+const IsAlreadyBusyError = require('../errors/is-already-busy-err');
+const { errorMessages } = require('../constants');
 
 // Получает информацию о пользователе
 module.exports.getUserInfo = (req, res, next) => {
   const userId = req.user._id;
-  // const userId = '610120993f55d3d1913b6819';
   if (!mongoose.isValidObjectId(userId)) {
-    throw new NoValidateError('userID пользователя не валиден');
+    throw new NoValidateError(errorMessages.invalidUserId);
   } else {
     return User.findById(userId)
-      .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
+      .orFail(new NotFoundError(errorMessages.notFoundUser))
       .then(({ email, name }) => res.send({ email, name }))
       .catch(next);
   }
@@ -26,7 +26,7 @@ module.exports.getUserInfo = (req, res, next) => {
 module.exports.updateUserInfo = (req, res, next) => {
   const userId = req.user._id;
   if (!mongoose.isValidObjectId(userId)) {
-    throw new NoValidateError('userID пользователя не валиден');
+    throw new NoValidateError(errorMessages.invalidUserId);
   } else {
     const { email, name } = req.body;
     return User.findByIdAndUpdate(
@@ -37,11 +37,13 @@ module.exports.updateUserInfo = (req, res, next) => {
         runValidators: true,
       },
     )
-      .orFail(new NotFoundError('Запрашиваемый пользователь не найден'))
-      .then(({ email: emailUp, name: nameUp }) => res.send({ emailUp, nameUp }))
+      .orFail(new NotFoundError(errorMessages.notFoundUser))
+      .then(({ email: emailUp, name: nameUp }) => res.send({ email: emailUp, name: nameUp }))
       .catch((err) => {
-        if (err.name === 'ValidationError') {
-          throw new NoValidateError('Проверьте введенные данные');
+        if (err.name === 'MongoError' && err.code === 11000) {
+          next(new IsAlreadyBusyError(errorMessages.isAlreadyBusy));
+        } else if (err.name === 'ValidationError') {
+          next(new NoValidateError(errorMessages.invalidData));
         } else next(err);
       });
   }
@@ -63,9 +65,9 @@ module.exports.createUser = (req, res, next) => {
     })
       .catch((err) => {
         if (err.name === 'ValidationError') {
-          throw new NoValidateError('Проверьте введенные данные');
+          throw new NoValidateError(errorMessages.invalidData);
         } else if (err.name === 'MongoError' && err.code === 11000) {
-          throw new IsAlreadyTakenError('Введенный email уже занят');
+          throw new IsAlreadyBusyError(errorMessages.isAlreadyBusy);
         } else next(err);
       }))
     .then(({ email: emailSaved, name: nameSaved }) => res
@@ -90,9 +92,8 @@ module.exports.login = (req, res, next) => {
           maxAge: 3600000,
           httpOnly: true,
           sameSite: false,
-          // secure: true,
         })
-        .send({ message: 'Вы успешно авторизованы!' });
+        .send({ message: errorMessages.successLogin });
     })
     .catch(next);
 };
@@ -104,9 +105,8 @@ module.exports.logout = (req, res, next) => {
       .clearCookie('jwt', {
         httpOnly: true,
         sameSite: false,
-        // secure: true,
       })
-      .send({ message: 'Вы успешно разлогинились!' });
+      .send({ message: errorMessages.successLogout });
   } catch (err) {
     next(err);
   }

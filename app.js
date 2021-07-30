@@ -5,18 +5,19 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
 
+const { PORT, DB_URL, DB_SETTINGS } = require('./config');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+const limiter = require('./middlewares/limiter');
 const routes = require('./routes');
 const cors = require('./middlewares/cors');
 const handlingErrors = require('./middlewares/handling-errors');
 
 const app = express();
-mongoose.connect('mongodb://localhost:27017/moviesdb', {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-  useUnifiedTopology: true,
-});
 
+mongoose.connect(DB_URL, JSON.parse(DB_SETTINGS));
+
+app.use(requestLogger);
+app.use(limiter);
 app.use(helmet());
 app.use(cors);
 app.use(bodyParser.json());
@@ -25,7 +26,8 @@ app.use(cookieParser());
 
 app.use(routes);
 
+app.use(errorLogger);
 app.use(errors());
 app.use(handlingErrors);
 
-app.listen(3000);
+app.listen(PORT);
