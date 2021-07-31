@@ -63,13 +63,13 @@ module.exports.deleteMovieById = (req, res, next) => {
       .orFail(new NotFoundError(errorMessages.notFoundUser))
       .then(() => {
         const { movieId } = req.params;
-        Movie.findOne({ movieId })
+        Movie.findById(movieId)
           .orFail(new NotFoundError(errorMessages.notFoundMovie))
           .then((movie) => {
             if (!movie.owner._id.equals(userId)) {
               throw new NotEnoughRightsError(errorMessages.notEnoughRights);
             } else {
-              Movie.findOneAndRemove({ movieId })
+              Movie.findByIdAndRemove(movieId)
                 .populate(['owner'])
                 .then((deletedMovie) => res.send(deletedMovie))
                 .catch(next);
