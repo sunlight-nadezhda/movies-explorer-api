@@ -5,7 +5,12 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
 
-const { PORT, DB_URL, DB_SETTINGS } = require('./config');
+const {
+  PORT,
+  DB_URL,
+  NODE_ENV,
+  DB_SETTINGS,
+} = require('./config');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const limiter = require('./middlewares/limiter');
 const routes = require('./routes');
@@ -14,7 +19,7 @@ const handlingErrors = require('./middlewares/handling-errors');
 
 const app = express();
 
-mongoose.connect(DB_URL, JSON.parse(DB_SETTINGS));
+mongoose.connect(DB_URL, NODE_ENV === 'production' ? JSON.parse(DB_SETTINGS) : DB_SETTINGS);
 
 app.use(requestLogger);
 app.use(limiter);
