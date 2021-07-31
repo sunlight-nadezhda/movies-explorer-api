@@ -34,6 +34,7 @@ const vallidateMessages = {
   movieIdRequired: 'Поле "movieId" не должно быть пустым',
   nameRURequired: 'Поле "nameRU" не должно быть пустым',
   nameENRequired: 'Поле "nameEN" не должно быть пустым',
+  invalidMovieId: 'movieId невалиден',
 };
 
 module.exports = {

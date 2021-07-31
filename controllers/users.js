@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -12,41 +11,32 @@ const { errorMessages } = require('../constants');
 // Получает информацию о пользователе
 module.exports.getUserInfo = (req, res, next) => {
   const userId = req.user._id;
-  if (!mongoose.isValidObjectId(userId)) {
-    throw new NoValidateError(errorMessages.invalidUserId);
-  } else {
-    return User.findById(userId)
-      .orFail(new NotFoundError(errorMessages.notFoundUser))
-      .then(({ email, name }) => res.send({ email, name }))
-      .catch(next);
-  }
+  User.findById(userId)
+    .then(({ email, name }) => res.send({ email, name }))
+    .catch(next);
 };
 
 // Обновляет информацию о пользователе
 module.exports.updateUserInfo = (req, res, next) => {
   const userId = req.user._id;
-  if (!mongoose.isValidObjectId(userId)) {
-    throw new NoValidateError(errorMessages.invalidUserId);
-  } else {
-    const { email, name } = req.body;
-    return User.findByIdAndUpdate(
-      userId,
-      { email, name },
-      {
-        new: true,
-        runValidators: true,
-      },
-    )
-      .orFail(new NotFoundError(errorMessages.notFoundUser))
-      .then(({ email: emailUp, name: nameUp }) => res.send({ email: emailUp, name: nameUp }))
-      .catch((err) => {
-        if (err.name === 'MongoError' && err.code === 11000) {
-          next(new ConflictError(errorMessages.conflict));
-        } else if (err.name === 'ValidationError') {
-          next(new NoValidateError(errorMessages.invalidData));
-        } else next(err);
-      });
-  }
+  const { email, name } = req.body;
+  return User.findByIdAndUpdate(
+    userId,
+    { email, name },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+    .orFail(new NotFoundError(errorMessages.notFoundUser))
+    .then(({ email: emailUp, name: nameUp }) => res.send({ email: emailUp, name: nameUp }))
+    .catch((err) => {
+      if (err.name === 'MongoError' && err.code === 11000) {
+        next(new ConflictError(errorMessages.conflict));
+      } else if (err.name === 'ValidationError') {
+        next(new NoValidateError(errorMessages.invalidData));
+      } else next(err);
+    });
 };
 
 // Создаёт пользователя с переданными в теле email, password и name

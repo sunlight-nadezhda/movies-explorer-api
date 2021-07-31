@@ -15,8 +15,8 @@ router.use('/movies', require('./movies'));
 
 router.post('/signout', logout);
 
-router.all('*', (req, res, next) => {
-  next(new NotFoundError(errorMessages.notFoundData));
+router.all('*', () => {
+  throw new NotFoundError(errorMessages.notFoundData);
 });
 
 module.exports = router;

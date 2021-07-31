@@ -1,5 +1,6 @@
 const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
+const mongoose = require('mongoose');
 
 const { vallidateMessages } = require('../constants');
 
@@ -189,5 +190,16 @@ module.exports.validateMovie = celebrate({
       .messages({
         'string.required': vallidateMessages.nameENRequired,
       }),
+  }),
+});
+
+module.exports.validateId = celebrate({
+  params: Joi.object().keys({
+    movieId: Joi.string().required().custom((value, helpers) => {
+      if (mongoose.isValidObjectId(value)) {
+        return value;
+      }
+      return helpers.message(vallidateMessages.invalidMovieId);
+    }),
   }),
 });
