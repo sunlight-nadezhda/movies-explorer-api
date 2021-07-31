@@ -10,7 +10,6 @@ const { errorMessages } = require('../constants');
 
 // Возвращает все сохранённые пользователем фильмы
 module.exports.getMovies = (req, res, next) => Movie.find({})
-  .populate(['owner'])
   .then((movies) => res.send(movies))
   .catch(next);
 
@@ -70,7 +69,6 @@ module.exports.deleteMovieById = (req, res, next) => {
               throw new NotEnoughRightsError(errorMessages.notEnoughRights);
             } else {
               Movie.findByIdAndRemove(movieId)
-                .populate(['owner'])
                 .then((deletedMovie) => res.send(deletedMovie))
                 .catch(next);
             }
