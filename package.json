@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "npx eslint .",
     "start": "node app.js",
-    "dev": "process.env.NODE_ENV !== 'production' && nodemon app.js"
+    "dev": "nodemon app.js"
   },
   "repository": {
     "type": "git",
