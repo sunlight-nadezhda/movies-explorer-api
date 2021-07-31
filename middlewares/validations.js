@@ -40,6 +40,58 @@ module.exports.validateUser = celebrate({
   }),
 });
 
+module.exports.validateLoginUser = celebrate({
+  body: Joi.object().keys({
+    password: Joi.string().required()
+      .custom((value, helpers) => {
+        if (!validator.isEmpty(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.passwordRequired);
+      })
+      .messages({
+        'string.required': vallidateMessages.passwordRequired,
+      }),
+    email: Joi.string().required()
+      .custom((value, helpers) => {
+        if (validator.isEmail(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.invalidEmail);
+      })
+      .messages({
+        'string.required': vallidateMessages.emailRequired,
+      }),
+  }),
+});
+
+module.exports.validateUpdateUser = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30)
+      .custom((value, helpers) => {
+        if (!validator.isEmpty(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.nameRequired);
+      })
+      .messages({
+        'string.required': vallidateMessages.nameRequired,
+        'string.min': vallidateMessages.nameMin,
+        'string.max': vallidateMessages.nameMax,
+      }),
+    email: Joi.string().required()
+      .custom((value, helpers) => {
+        if (validator.isEmail(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.invalidEmail);
+      })
+      .messages({
+        'string.required': vallidateMessages.emailRequired,
+      }),
+  }),
+});
+
 module.exports.validateMovie = celebrate({
   body: Joi.object().keys({
     country: Joi.string().required()
