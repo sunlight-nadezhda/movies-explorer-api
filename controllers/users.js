@@ -6,7 +6,7 @@ const { NODE_ENV, JWT_SECRET } = require('../config');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const NoValidateError = require('../errors/no-validate-err');
-const IsAlreadyBusyError = require('../errors/is-already-busy-err');
+const ConflictError = require('../errors/conflict-err');
 const { errorMessages } = require('../constants');
 
 // Получает информацию о пользователе
@@ -41,7 +41,7 @@ module.exports.updateUserInfo = (req, res, next) => {
       .then(({ email: emailUp, name: nameUp }) => res.send({ email: emailUp, name: nameUp }))
       .catch((err) => {
         if (err.name === 'MongoError' && err.code === 11000) {
-          next(new IsAlreadyBusyError(errorMessages.isAlreadyBusy));
+          next(new ConflictError(errorMessages.conflict));
         } else if (err.name === 'ValidationError') {
           next(new NoValidateError(errorMessages.invalidData));
         } else next(err);
@@ -67,7 +67,7 @@ module.exports.createUser = (req, res, next) => {
         if (err.name === 'ValidationError') {
           throw new NoValidateError(errorMessages.invalidData);
         } else if (err.name === 'MongoError' && err.code === 11000) {
-          throw new IsAlreadyBusyError(errorMessages.isAlreadyBusy);
+          throw new ConflictError(errorMessages.conflict);
         } else next(err);
       }))
     .then(({ email: emailSaved, name: nameSaved }) => res

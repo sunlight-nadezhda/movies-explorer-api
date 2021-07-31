@@ -7,7 +7,7 @@ const errorMessages = {
   invalidData: 'Проверьте введенные данные',
   notFoundMovie: 'Запрашиваемый фильм не найден',
   notEnoughRights: 'Не достаточно прав',
-  isAlreadyBusy: 'Введенный email уже занят',
+  conflict: 'Введенный email уже занят',
   successLogin: 'Вы успешно авторизованы!',
   successLogout: 'Вы успешно разлогинились!',
   notFoundData: 'Запрашиваемый ресурс не найден',
