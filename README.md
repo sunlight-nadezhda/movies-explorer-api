@@ -12,5 +12,5 @@
 
 `npm run dev` для запуска сервера в режиме development
 
-публичный IP-адрес сервера: 178.154.228.70
-backend: api.movies-explorer.sun.nomoredomains.monster
+Публичный IP-адрес сервера: 178.154.228.70  
+Backend: api.movies-explorer.sun.nomoredomains.monster
