@@ -1,8 +1,8 @@
 // Массив доменов, с которых разрешены кросс-доменные запросы
 const allowedCors = [
-  'https://mesto-front.nomoredomains.rocks',
-  'http://mesto-front.nomoredomains.rocks',
-  'localhost:3000',
+  'https://movies-explorer.sun.nomoredomains.monster',
+  'http://movies-explorer.sun.nomoredomains.monster',
+  'http://localhost:3000',
   'http://localhost:3001',
 ];
 
