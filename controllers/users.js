@@ -79,9 +79,10 @@ module.exports.login = (req, res, next) => {
 
       res
         .cookie('jwt', token, {
-          maxAge: 3600000,
-          httpOnly: true,
-          sameSite: false,
+          maxAge: 3600000 * 24,
+          // httpOnly: true,
+          // sameSite: 'lax',
+          // domain: 'localhost:3000',
         })
         .send({ message: errorMessages.successLogin });
     })
@@ -93,8 +94,8 @@ module.exports.logout = (req, res, next) => {
   try {
     res
       .clearCookie('jwt', {
-        httpOnly: true,
-        sameSite: false,
+        // httpOnly: true,
+        // sameSite: false,
       })
       .send({ message: errorMessages.successLogout });
   } catch (err) {
