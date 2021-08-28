@@ -82,7 +82,7 @@ module.exports.login = (req, res, next) => {
           maxAge: 3600000 * 24,
           httpOnly: true,
           sameSite: 'strict',
-          domain: 'movies-explorer.sun.nomoredomains.monster',
+          domain: '.nomoredomains.monster',
           path: '/',
         })
         .send({ message: errorMessages.successLogin });
@@ -97,7 +97,7 @@ module.exports.logout = (req, res, next) => {
       .clearCookie('jwt', {
         httpOnly: true,
         sameSite: 'strict',
-        domain: 'movies-explorer.sun.nomoredomains.monster',
+        domain: '.nomoredomains.monster',
         path: '/',
       })
       .send({ message: errorMessages.successLogout });
