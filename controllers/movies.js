@@ -9,9 +9,9 @@ const { errorMessages } = require('../constants');
 // Возвращает все сохранённые пользователем фильмы
 module.exports.getMovies = (req, res, next) => {
   const userId = req.user._id;
-
   return Movie.find({})
-    .then((movies) => res.send(movies.filter((film) => film.owner === userId)))
+    .then((movies) => res
+      .send(movies.filter((film) => film.owner.toString() === userId.toString())))
     .catch(next);
 };
 
