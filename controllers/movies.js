@@ -7,9 +7,13 @@ const NotEnoughRightsError = require('../errors/not-enough-rights-err');
 const { errorMessages } = require('../constants');
 
 // Возвращает все сохранённые пользователем фильмы
-module.exports.getMovies = (req, res, next) => Movie.find({})
-  .then((movies) => res.send(movies))
-  .catch(next);
+module.exports.getMovies = (req, res, next) => {
+  const userId = req.user._id;
+  return Movie.find({})
+    .then((movies) => res
+      .send(movies.filter((film) => film.owner.toString() === userId.toString())))
+    .catch(next);
+};
 
 // Создаёт фильм с переданными в теле данными о фильме
 module.exports.createMovie = (req, res, next) => {

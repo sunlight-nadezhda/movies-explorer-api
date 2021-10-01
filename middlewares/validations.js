@@ -96,12 +96,6 @@ module.exports.validateUpdateUser = celebrate({
 module.exports.validateMovie = celebrate({
   body: Joi.object().keys({
     country: Joi.string().required()
-      .custom((value, helpers) => {
-        if (!validator.isEmpty(value)) {
-          return value;
-        }
-        return helpers.message(vallidateMessages.countryRequired);
-      })
       .messages({
         'string.required': vallidateMessages.countryRequired,
       }),
@@ -139,12 +133,13 @@ module.exports.validateMovie = celebrate({
       .messages({
         'string.required': vallidateMessages.descriptionRequired,
       }),
-    image: Joi.string().required().custom((value, helpers) => {
-      if (validator.isURL(value)) {
-        return value;
-      }
-      return helpers.message(vallidateMessages.invalidImageURL);
-    })
+    image: Joi.string().required()
+      .custom((value, helpers) => {
+        if (!validator.isEmpty(value)) {
+          return value;
+        }
+        return helpers.message(vallidateMessages.imageRequired);
+      })
       .messages({
         'string.required': vallidateMessages.imageRequired,
       }),
@@ -157,12 +152,7 @@ module.exports.validateMovie = celebrate({
       .messages({
         'string.required': vallidateMessages.trailerRequired,
       }),
-    thumbnail: Joi.string().required().custom((value, helpers) => {
-      if (validator.isURL(value)) {
-        return value;
-      }
-      return helpers.message(vallidateMessages.invalidThumbnailURL);
-    })
+    thumbnail: Joi.string().required()
       .messages({
         'string.required': vallidateMessages.thumbnailRequired,
       }),

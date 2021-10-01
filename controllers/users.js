@@ -60,8 +60,23 @@ module.exports.createUser = (req, res, next) => {
           throw new ConflictError(errorMessages.conflict);
         } else next(err);
       }))
-    .then(({ email: emailSaved, name: nameSaved }) => res
-      .send({ email: emailSaved, name: nameSaved }))
+    .then(({ email: emailSaved, name: nameSaved, _id }) => {
+      const token = jwt.sign(
+        { _id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' },
+      );
+
+      return res
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24,
+          // httpOnly: true,
+          // sameSite: 'strict',
+          // domain: '.nomoredomains.monster',
+          // path: '/',
+        })
+        .send({ email: emailSaved, name: nameSaved });
+    })
     .catch(next);
 };
 
@@ -79,9 +94,11 @@ module.exports.login = (req, res, next) => {
 
       res
         .cookie('jwt', token, {
-          maxAge: 3600000,
-          httpOnly: true,
-          sameSite: false,
+          maxAge: 3600000 * 24,
+          // httpOnly: true,
+          // sameSite: 'strict',
+          // domain: '.nomoredomains.monster',
+          // path: '/',
         })
         .send({ message: errorMessages.successLogin });
     })
@@ -93,8 +110,10 @@ module.exports.logout = (req, res, next) => {
   try {
     res
       .clearCookie('jwt', {
-        httpOnly: true,
-        sameSite: false,
+        // httpOnly: true,
+        // sameSite: 'strict',
+        // domain: '.nomoredomains.monster',
+        // path: '/',
       })
       .send({ message: errorMessages.successLogout });
   } catch (err) {
