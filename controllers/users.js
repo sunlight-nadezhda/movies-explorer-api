@@ -70,10 +70,6 @@ module.exports.createUser = (req, res, next) => {
       return res
         .cookie('jwt', token, {
           maxAge: 3600000 * 24,
-          // httpOnly: true,
-          // sameSite: 'strict',
-          // domain: '.nomoredomains.monster',
-          // path: '/',
         })
         .send({ email: emailSaved, name: nameSaved });
     })
@@ -95,10 +91,6 @@ module.exports.login = (req, res, next) => {
       res
         .cookie('jwt', token, {
           maxAge: 3600000 * 24,
-          // httpOnly: true,
-          // sameSite: 'strict',
-          // domain: '.nomoredomains.monster',
-          // path: '/',
         })
         .send({ message: errorMessages.successLogin });
     })
@@ -109,12 +101,7 @@ module.exports.login = (req, res, next) => {
 module.exports.logout = (req, res, next) => {
   try {
     res
-      .clearCookie('jwt', {
-        // httpOnly: true,
-        // sameSite: 'strict',
-        // domain: '.nomoredomains.monster',
-        // path: '/',
-      })
+      .clearCookie('jwt')
       .send({ message: errorMessages.successLogout });
   } catch (err) {
     next(err);
